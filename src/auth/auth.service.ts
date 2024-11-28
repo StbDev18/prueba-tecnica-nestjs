@@ -39,8 +39,6 @@ export class AuthService {
         password: bcrypt.hashSync(password, 10) // Generación de hash (Siempre es diferente)
       }); //Solo crea en memoria
 
-      console.log(user);
-
       await this._userRepository.save(user); // Guarda en la DB
       
       delete user.password; // No se debe devolver el password (Lo eliminamos)
