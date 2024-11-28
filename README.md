@@ -43,6 +43,10 @@ $ npm run start:dev
 
 ```
 
+## Documentación
+
+- [Postman Endpoints](https://documenter.getpostman.com/view/14890988/2sAYBXBqea)
+
 ### Librerias
 
 1. ```@nestjs/typeorm``` y ```typeorm```
@@ -89,6 +93,13 @@ $ npm run start:dev
 
     ```bash
     $ npm install pg --save 
+    ```
+
+9. ```@nestjs/swagger``` (Documentación)
+
+    ```bash
+    $ npm install --save @nestjs/swagger
+
     ```
 
 ## License

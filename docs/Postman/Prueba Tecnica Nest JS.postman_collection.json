@@ -1,0 +1,247 @@
+{
+	"info": {
+		"_postman_id": "fc57d85c-8f4a-4ef7-a7ba-5a8e51788094",
+		"name": "Prueba Tecnica Nest JS",
+		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
+		"_exporter_id": "14890988"
+	},
+	"item": [
+		{
+			"name": "Auth",
+			"item": [
+				{
+					"name": "SignUp",
+					"request": {
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n    \"email\": \"developer@example.com\",\r\n    \"password\": \"Developer123\",\r\n    \"fullName\": \"Developer Nest Js\",\r\n    \"roles\": [\"super-user\", \"admin\"]\r\n}\r\n// {\r\n//     \"email\": \"admin@example.com\",\r\n//     \"password\": \"Admin123\",\r\n//     \"fullName\": \"Admin Nest Js\",\r\n//     \"roles\": [\"admin\"]\r\n// }\r\n// {\r\n//     \"email\": \"user@example.com\",\r\n//     \"password\": \"User123\",\r\n//     \"fullName\": \"User Nest Js\",\r\n//     \"roles\": [\"user\"]\r\n// }",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{url}}/api/auth/signup",
+							"host": [
+								"{{url}}"
+							],
+							"path": [
+								"api",
+								"auth",
+								"signup"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "SignIn",
+					"request": {
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n    \"email\": \"developer@example.com\",\r\n    \"password\": \"Developer123\"\r\n}\r\n// {\r\n//     \"email\": \"admin@example.com\",\r\n//     \"password\": \"Admin123\"\r\n// }\r\n// {\r\n//     \"email\": \"user@example.com\",\r\n//     \"password\": \"User123\"\r\n// }",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{url}}/api/auth/login",
+							"host": [
+								"{{url}}"
+							],
+							"path": [
+								"api",
+								"auth",
+								"login"
+							]
+						}
+					},
+					"response": []
+				}
+			]
+		},
+		{
+			"name": "Tasks",
+			"item": [
+				{
+					"name": "get-all",
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6IjlkM2U2ZTg0LWRmYzYtNGE2MS1iMjQ1LTNhODU4MTdiY2EyNCIsImlhdCI6MTczMjgxNzg2MiwiZXhwIjoxNzMyODE4NDYyfQ.hdMtMxeSNiow0RLmNc8PnowP-DWpsITAAZ-K9DWmexI",
+									"type": "string"
+								}
+							]
+						},
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{url}}/api/tasks?limit=300&offset=0",
+							"host": [
+								"{{url}}"
+							],
+							"path": [
+								"api",
+								"tasks"
+							],
+							"query": [
+								{
+									"key": "limit",
+									"value": "300"
+								},
+								{
+									"key": "offset",
+									"value": "0"
+								}
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "get-by-id",
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6ImY1YTc3NTA0LThjZDktNDVlYi05MGU3LTQ4MGY0Y2UwNTI0MCIsImlhdCI6MTczMjgxNTA1MiwiZXhwIjoxNzMyODE1NjUyfQ.wdyqdQ1nXJjYaaHUa4lELSdMHeUE6DdFCJEZ4IKwBZM",
+									"type": "string"
+								}
+							]
+						},
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{url}}/api/tasks/8e265c60-fb6c-4f70-ad3c-30a54c62d8db",
+							"host": [
+								"{{url}}"
+							],
+							"path": [
+								"api",
+								"tasks",
+								"8e265c60-fb6c-4f70-ad3c-30a54c62d8db"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Insert",
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6IjlkM2U2ZTg0LWRmYzYtNGE2MS1iMjQ1LTNhODU4MTdiY2EyNCIsImlhdCI6MTczMjgxNzg2MiwiZXhwIjoxNzMyODE4NDYyfQ.hdMtMxeSNiow0RLmNc8PnowP-DWpsITAAZ-K9DWmexI",
+									"type": "string"
+								}
+							]
+						},
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n    \"title\": \"Ordenar habitación\",\r\n    \"description\": \"Consiste en poner cada cosa de la habitación en su lugar\"\r\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{url}}/api/tasks",
+							"host": [
+								"{{url}}"
+							],
+							"path": [
+								"api",
+								"tasks"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "update",
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6ImY1YTc3NTA0LThjZDktNDVlYi05MGU3LTQ4MGY0Y2UwNTI0MCIsImlhdCI6MTczMjgxNTA1MiwiZXhwIjoxNzMyODE1NjUyfQ.wdyqdQ1nXJjYaaHUa4lELSdMHeUE6DdFCJEZ4IKwBZM",
+									"type": "string"
+								}
+							]
+						},
+						"method": "PATCH",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n    \"status\": \"in-progress\"\r\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{url}}/api/tasks/8e265c60-fb6c-4f70-ad3c-30a54c62d8db",
+							"host": [
+								"{{url}}"
+							],
+							"path": [
+								"api",
+								"tasks",
+								"8e265c60-fb6c-4f70-ad3c-30a54c62d8db"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "delete",
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6ImY1YTc3NTA0LThjZDktNDVlYi05MGU3LTQ4MGY0Y2UwNTI0MCIsImlhdCI6MTczMjgxNTA1MiwiZXhwIjoxNzMyODE1NjUyfQ.wdyqdQ1nXJjYaaHUa4lELSdMHeUE6DdFCJEZ4IKwBZM",
+									"type": "string"
+								}
+							]
+						},
+						"method": "DELETE",
+						"header": [],
+						"url": {
+							"raw": "{{url}}/api/tasks/8e265c60-fb6c-4f70-ad3c-30a54c62d8db",
+							"host": [
+								"{{url}}"
+							],
+							"path": [
+								"api",
+								"tasks",
+								"8e265c60-fb6c-4f70-ad3c-30a54c62d8db"
+							]
+						}
+					},
+					"response": []
+				}
+			]
+		}
+	]
+}

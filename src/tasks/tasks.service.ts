@@ -1,10 +1,10 @@
-import { BadRequestException, Injectable, InternalServerErrorException, Logger, NotFoundException } from '@nestjs/common';
+import { BadRequestException, ForbiddenException, Injectable, InternalServerErrorException, Logger, NotFoundException } from '@nestjs/common';
 import { CreateTaskDto } from './dto/create-task.dto';
 import { Task } from './entities/task.entity';
 import { InjectRepository } from '@nestjs/typeorm';
-import { DataSource, Repository } from 'typeorm';
-import { User } from 'src/auth/entities/user.entity';
-import { PaginationDto } from 'src/common/dtos/pagination.dto';
+import { Repository } from 'typeorm';
+import { User } from '../auth/entities/user.entity';
+import { PaginationDto } from '../common/dtos/pagination.dto';
 import { validate as isUUID } from "uuid";
 import { UpdateTaskDto } from './dto';
 
@@ -60,12 +60,11 @@ export class TasksService {
   //   this.tasks = tasks;
   // }
 
-  private readonly logger = new Logger('ProductsService');
+  private readonly logger = new Logger('TaskService');
 
   constructor(
     @InjectRepository(Task)
-    private readonly _taskRepository: Repository<Task>,
-    private readonly dataSoruce: DataSource
+    private readonly _taskRepository: Repository<Task>
   ) { }
 
   async create(createTaskDto: CreateTaskDto, user: User) {
@@ -86,41 +85,37 @@ export class TasksService {
 
   }
 
-  async findAll(paginationDto: PaginationDto) {
+  async findAll(paginationDto: PaginationDto, user: User) {
     const { limit = 10, offset = 0 } = paginationDto;
     const tasks = await this._taskRepository.find({
       take: limit,
-      skip: offset
+      skip: offset,
+      where: { userId: user.id },
     });
     return tasks
   }
 
-  async findOne(term: string) {
+  async findOne(term: string, user: User) {
     let task: Task;
 
     if (isUUID(term)) {
-      task = await this._taskRepository.findOneBy({ id: term }); // Las imagenes vienen por el eager de la entidad
+      task = await this._taskRepository.findOneBy({ id: term, userId: user.id }); // Las imagenes vienen por el eager de la entidad
     } else {
-      const queryBuilder = this._taskRepository.createQueryBuilder('prod');
+      const queryBuilder = this._taskRepository.createQueryBuilder();
       task = await queryBuilder
-        .where('UPPER(title)=:title', {
-          title: term.toUpperCase()
+        .where('UPPER(title)=:title and userId=:userId', {
+          title: term.toUpperCase(),
+          userId: user.id,
         })
-        .leftJoinAndSelect('prod.images', 'prodImages') // Esto me permite traer las imagenes para la busqueda
         .getOne();
     }
 
-    if (!task) throw new NotFoundException(`Product with id '${term}' not found`);
+    if (!task) throw new NotFoundException(`Task with id '${term}' not found`);
 
     return task;
   }
 
   async update(id: string, updateTaskDto: UpdateTaskDto, user: User) {
-
-    //Create query runner
-    const queryRunner = this.dataSoruce.createQueryRunner(); // Este no va a impactar la DB hasta que se confirme el commit
-    await queryRunner.connect(); // Nos conectamos a la DB
-    await queryRunner.startTransaction(); // Lo que se ejecute se relaciona a la transaccion
 
     try {
 
@@ -136,36 +131,21 @@ export class TasksService {
 
       if (!task) throw new NotFoundException(`Task with id ${id} not found`);
 
+      // Verificamos si el usuario que hace la actualización es el mismo que creó la tarea
+      if (task.userId !== user.id) throw new ForbiddenException('You are not authorized to update this task');
+
       task.user = user;
-
-
-
-      /**
-       * *Logica de queryRunner
-       * ! Cuidado: si se habilita se deve inhabilitar el save del respository
-      */
-      // await queryRunner.manager.save(task);
-      // await queryRunner.commitTransaction(); // Confirmamos la transaccion
-      // await queryRunner.release(); // Detenemos el query runner, tocaria arrancarlo de nuevo en caso tal de necesitarse
 
       await this._taskRepository.save(task);
 
       return task;
     } catch (error) {
-
-      /**
-       * * Logica de rollback de queryRunner
-       * ! Cuidado: se habilita si se hace uso del queryRunner
-       * ? hace rollback de la transaccion en caso tal de que ocurra algo en alguno de los procesos de la transaccion
-      */
-      // await queryRunner.rollbackTransaction();
-
       this.handleDBExceptions(error);
     }
   }
 
-  async remove(id: string) {
-    const task = await this.findOne(id);
+  async remove(id: string, user: User) {
+    const task = await this.findOne(id, user);
 
     if (!task) throw new NotFoundException(`Task with id '${id}' not found`);
 
@@ -176,6 +156,7 @@ export class TasksService {
 
   private handleDBExceptions(error: any) {
     if (error.code === '23505') throw new BadRequestException(error.detail);
+    if (error.status == 403) throw error;
 
     this.logger.error(error);
     throw new InternalServerErrorException('Unexpected error, check server logs');

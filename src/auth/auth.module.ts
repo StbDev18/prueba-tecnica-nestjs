@@ -35,7 +35,7 @@ import { JwtStrategy } from './strategies/jwt.strategy';
              * @param '2d' -> 2 días. 
              * @param '1w' -> 1 semana. 
              */
-            expiresIn: '10m' //Expiración del token (10 minutos)
+            expiresIn: '30m' //Expiración del token (10 minutos)
           }
         }
       }
