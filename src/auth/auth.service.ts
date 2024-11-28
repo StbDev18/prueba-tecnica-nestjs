@@ -1,26 +1,102 @@
-import { Injectable } from '@nestjs/common';
-import { CreateAuthDto } from './dto/create-auth.dto';
-import { UpdateAuthDto } from './dto/update-auth.dto';
+import { BadRequestException, Injectable, InternalServerErrorException, Logger, UnauthorizedException } from '@nestjs/common';
+import { CreateUserDto, SigninUserDto } from './dto';
+import { User } from './entities/user.entity';
+import { Repository } from 'typeorm';
+import { JwtService } from '@nestjs/jwt';
+import * as bcrypt from "bcrypt";
+import { InjectRepository } from '@nestjs/typeorm';
+import { JwtPayload } from './interfaces/jwt-payload.interface';
+
 
 @Injectable()
 export class AuthService {
-  create(createAuthDto: CreateAuthDto) {
-    return 'This action adds a new auth';
+
+  private readonly logger = new Logger('AuthService');
+  
+  constructor(
+    @InjectRepository(User) private readonly _userRepository: Repository<User>,
+    private readonly _jwtService: JwtService
+  ){}
+  
+  /**
+   * * Servicio para registrar usuarios
+   */
+  async create(createUserDto: CreateUserDto) {
+
+    try {
+
+      /**
+       * * Encriptación de contraseña
+       */
+
+      const {password, ...userData} = createUserDto;
+
+      /**
+       * * Crear y guardar la data
+       */
+      const user = this._userRepository.create({
+        ...userData,
+        password: bcrypt.hashSync(password, 10) // Generación de hash (Siempre es diferente)
+      }); //Solo crea en memoria
+
+      console.log(user);
+
+      await this._userRepository.save(user); // Guarda en la DB
+      
+      delete user.password; // No se debe devolver el password (Lo eliminamos)
+
+      return {
+        ...user,
+        token: this.getJwtToken({id: user.id})
+      };
+    } catch (error) {
+      this.handleDBExceptions(error);
+    }
+
   }
 
-  findAll() {
-    return `This action returns all auth`;
+  /**
+   * * Servicio para iniciar sesion
+   */
+  async singIn(singInUserDto: SigninUserDto) {
+    const {password, email} = singInUserDto;
+
+    /**
+     * * Se hace de esta manera para que solo me devuelva los campos que necesito, es decir "email", "password" y "id"
+     * * ya que en el entity el password cuenta con el select: false, si usaramos solo el metodo findOne este nos descarta el password
+     */
+    const user = await this._userRepository.findOne({
+      where: {email},
+      select: {email: true, password: true, id: true}
+    }); // Buscamos el usuario por email
+
+    if(!user) throw new UnauthorizedException('Credentials are not valid (email)');
+  
+    /**
+     * * Comparamos la contraseña
+     */
+    if(!bcrypt.compareSync(password, user.password)) throw new UnauthorizedException('Credentials are not valid (password)');
+
+    return {
+      ...user,
+      token: this.getJwtToken({id: user.id})
+    };
   }
 
-  findOne(id: number) {
-    return `This action returns a #${id} auth`;
+  private getJwtToken(payload: JwtPayload) {
+    const token = this._jwtService.sign(payload); // Firma del token
+    return token;
   }
 
-  update(id: number, updateAuthDto: UpdateAuthDto) {
-    return `This action updates a #${id} auth`;
-  }
+  /**
+   * * Metodo para capturar el error
+   * ? :never quiere decir que jamas retorna un valor
+   */
+  private handleDBExceptions(error: any): never {
+    if (error.code === '23505') throw new BadRequestException(error.detail);
 
-  remove(id: number) {
-    return `This action removes a #${id} auth`;
+    this.logger.error(error);
+    throw new InternalServerErrorException('Unexpected error, check server logs');
   }
 }
+
