@@ -6,6 +6,10 @@
 
 Prueba técnica de [Nest JS](https://github.com/nestjs/nest).
 
+## Consideración
+
+- El Api utiliza docker para la generacion de la base de datos, es IMPORTANTE contar con este recurso.
+
 ## 1. Clonar proyecto
 
 ```bash
