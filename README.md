@@ -21,7 +21,7 @@ $ npm install
 ## 3. Configurar variables de entorno
 
 - Clonar el archivo ```.env.template``` y renombrar a ```.env```
-- Cambiar las variables de entorno
+- Cambiar las variables de entorno (de ser necesario)
 
 ## 4. Imagen Docker
 
@@ -43,9 +43,15 @@ $ npm run start:dev
 
 ```
 
-## Documentación
+## 6. Verificar servidor corriendo
 
-- [Postman Endpoints](https://documenter.getpostman.com/view/14890988/2sAYBXBqea)
+- Visitar ```http://localhost:3000/api/tasks```, debemor tener respuesta por parte del servidor.
+
+### Documentación
+
+- Generado con la version [NodeJS](https://nodejs.org/en/) (22.11.0).
+- Documentación Postman [Postman Endpoints](https://documenter.getpostman.com/view/14890988/2sAYBXBqea)
+- Documentación Swagger [Swagger](http://localhost:3000/api) (Local)
 
 ### Librerias
 
